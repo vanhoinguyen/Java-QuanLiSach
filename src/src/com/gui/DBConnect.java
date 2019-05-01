@@ -42,6 +42,7 @@ public class DBConnect {
         return rs;
     }
     
+    
     public int ExecuteSQLInsert (String[] stringsSQL){
         int rowInserted = 0;
         String sql = "INSERT INTO SACH(MaSach,TenSach,TheLoai,TacGia,TinhTrang,GiaTien) VALUES (?,?,?,?,?,?)";
@@ -64,7 +65,7 @@ public class DBConnect {
     }   
     public int ExecuteSQLUpdate (String[] stringsSQL){
         int rowInserted = 0;
-        String sql = "UPDATE SACH SET TenSach=?,TheLoai=?,TacGia=?,TinhTrang=?,GiaTien=? WHERE MaSach=?";
+        String sql = "UPDATE SACH SET TenSach=?,TheLoai=?,MaTacGia=?,TinhTrang=?,GiaTien=? WHERE MaSach=?";
         PreparedStatement statement ; 
         try{
             statement = con.prepareStatement(sql);
@@ -156,7 +157,7 @@ public class DBConnect {
     
     public int ExecuteSQLInsertMuon (String[] stringsSQL){
         int rowInserted = 0;
-        String sql = "INSERT INTO MUON(MaPhieuMuon,MaDocGia,MaSach,NgayMuon) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO MUON(MaPhieuMuon,MaDocGia,MaSach,NgayMuon,MaDichVu) VALUES (?,?,?,?,?)";
         PreparedStatement statement ; 
         try{
             statement = con.prepareStatement(sql);
@@ -164,7 +165,7 @@ public class DBConnect {
             statement.setString(2,stringsSQL[1]);
             statement.setString(3,stringsSQL[2]);
             statement.setString(4,stringsSQL[3]);
-            
+            statement.setString(5,stringsSQL[4]);
             rowInserted = statement.executeUpdate();
         }
         catch(SQLException ex){
@@ -174,7 +175,7 @@ public class DBConnect {
     }    
     public int ExecuteSQLUpdateMuon (String[] stringsSQL){
         int rowInserted = 0;
-        String sql = "UPDATE MUON SET MaDocGia = ? , MaSach = ? , NgayMuon = ? WHERE MaPhieuMuon = ?";
+        String sql = "UPDATE MUON SET MaDocGia = ? , MaSach = ? , NgayMuon = ? , MaDichVu = ? WHERE MaPhieuMuon = ?";
         PreparedStatement statement ; 
         try{
             statement = con.prepareStatement(sql);
@@ -182,7 +183,7 @@ public class DBConnect {
             statement.setString(2,stringsSQL[1]);
             statement.setString(3,stringsSQL[2]);
             statement.setString(4,stringsSQL[3]);
-            
+            statement.setString(5,stringsSQL[4]);
             rowInserted = statement.executeUpdate();
         }
         catch(SQLException ex){
