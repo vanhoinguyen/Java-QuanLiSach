@@ -105,18 +105,24 @@ public class GUI extends javax.swing.JFrame {
             Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
         }
     }
+    public int count = 0;
     public void showSumOfSachChoMuon(){
-        String name = "Đã cho thuê";
-       ResultSet rs = con.getData("SELECT COUNT (*) as total FROM SACH WHERE TinhTrang != 'Đã cho thuê' "); 
+       
+       ResultSet rs = con.getData("SELECT TinhTrang FROM SACH "); 
       
        try{
-        while (rs.next()){
-            txtSoSachChoMuon.setText( rs.getString("total"));
-            System.out.println(rs.getString("total"));
+        
+        while (rs.next()){           
+           
+           if(rs.getString("TinhTrang").equals("Đã cho thuê") == true)
+           {count++;
+           
+           }
         }}
         catch(SQLException ex){
             Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
         } 
+       txtSoSachChoMuon.setText(String.valueOf(count));
     }
 //    public void showSumOfMoney(){
 //       ResultSet rs = con.getData("SELECT COUNT (*) as total FROM SACH "); 
@@ -134,7 +140,6 @@ public class GUI extends javax.swing.JFrame {
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(columnNames);
         tbQLSach.setModel(model);
-        
         String MaSach = "";
         String TenSach = "";
         String TheLoai = "";
@@ -315,26 +320,41 @@ public class GUI extends javax.swing.JFrame {
         }      
     }
     
+    public int j=1;
     public void InsertSachData(){
-        String MaSach = inputMaSach.getText();
+        
+        
+        for (int i=0;i <tbQLSach.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLSach.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaSach =  Integer.toString(j);
         String TenSach = inputTenSach.getText();
         String TheLoai = inputTheLoai.getText();
         String TacGia = inputTacGia.getText();
+        String MaNXB = inputNXB.getText();
         String TinhTrang = inputTinhTrang.getText();
         String GiaTien = inputGiaTien.getText();
-        String[] stringsSQL = {MaSach,TenSach,TheLoai,TacGia,TinhTrang,GiaTien};
+        String[] stringsSQL = {MaSach,TenSach,TheLoai,TacGia,MaNXB,TinhTrang,GiaTien};
         
         int isInsert = con.ExecuteSQLInsert(stringsSQL);
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {
             JOptionPane.showMessageDialog(this,"Bạn chưa thêm được dữ liệu");
         }
-        showData();
         ClearText();
+        showData();
+        
     }    
     public void UpdateSachData(){
         String MaSach = inputMaSach.getText();
@@ -376,7 +396,16 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertDocGiaData(){
-        String MaDocGia = Integer.toString(tbQLDocGia.getRowCount() + 1);
+        for (int i=0;i <tbQLDocGia.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLDocGia.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaDocGia =  Integer.toString(j);
         String TenDocGia = inputTenDocGia.getText();
         String DiaChi = inputDiaChi.getText();
         String Email = inputEmail.getText();
@@ -388,6 +417,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j =1;
         }
         else
         {
@@ -437,11 +467,18 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertMuonData(){
-        String MaPhieuMuon = Integer.toString(tbQLMuonSach.getRowCount() + 1);
+        for (int i=0;i <tbQLMuonSach.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLMuonSach.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaPhieuMuon = Integer.toString(j);
         String MaDocGia = inputMaDocGia.getText();
         String MaSach = inputMaSach_Muon.getText();
-        System.out.println(datechooser.getDate());
-        System.out.println(datechooser.getDate().toString());
         SimpleDateFormat Date_Format = new SimpleDateFormat("MM-dd-yyyy"); 
         String NgayMuon = Date_Format.format(datechooser.getDate()).toString();
         String MaDichVu = null;
@@ -451,6 +488,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {
@@ -503,7 +541,16 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertNXBData(){
-        String MaNXB = Integer.toString(tbQLNXB.getRowCount() + 1);
+        for (int i=0;i <tbQLNXB.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLNXB.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaNXB = Integer.toString(j);
         String TenNXB = txtNXB.getText();
         String DiaChi = txtDiaChi.getText();
         String Email =  txtEmail.getText();
@@ -515,6 +562,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {
@@ -564,7 +612,16 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertNhanVienData(){
-        String MaNhanVien = Integer.toString(tbQLNhanVien.getRowCount() + 1);
+        for (int i=0;i <tbQLNhanVien.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLNhanVien.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaNhanVien = Integer.toString(j);
         String TenNhanVien = txtNhanVien.getText();
         String ChucVu = txtChucVu.getText();
         
@@ -575,6 +632,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {
@@ -623,9 +681,18 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertDichVuData(){
-        String MaDichVu = Integer.toString(tbQLDichVu.getRowCount() + 1);
-        String TenDichVu = inputMaDocGia.getText();
-        String GiaTien = inputMaSach.getText();
+        for (int i=0;i <tbQLDichVu.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLDichVu.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaDichVu = Integer.toString(j);
+        String TenDichVu = txtTenDichVu.getText();
+        String GiaTien = txtGiaTien.getText();
         
         
         String[] stringsSQL = {MaDichVu,TenDichVu,GiaTien};
@@ -634,6 +701,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {
@@ -682,7 +750,16 @@ public class GUI extends javax.swing.JFrame {
     }
     
     public void InsertTacGiaData(){
-        String MaTacGia = Integer.toString(tbQLTacGia.getRowCount() + 1);
+        for (int i=0;i <tbQLTacGia.getRowCount();i++)
+        {
+            if(Integer.valueOf(tbQLTacGia.getModel().getValueAt(i, 0).toString())==j)
+                j++;
+            else {
+                
+                break;
+            }
+        }
+        String MaTacGia = Integer.toString(j);
         String TenTacGia = txtTenTacGia.getText();
         String website = txtwebsite.getText();
         String GhiChu = txtGhiChu.getText();
@@ -693,6 +770,7 @@ public class GUI extends javax.swing.JFrame {
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã thêm dữ liệu thành công");
+            j=1;
         }
         else
         {

@@ -6,6 +6,7 @@
 package com.gui;
 
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,6 +34,7 @@ public class DBConnect {
     public ResultSet getData(String stringSQL){
         ResultSet rs = null;
         try{
+            
             Statement state = con.createStatement();
             rs = state.executeQuery(stringSQL);
         }
@@ -45,7 +47,7 @@ public class DBConnect {
     
     public int ExecuteSQLInsert (String[] stringsSQL){
         int rowInserted = 0;
-        String sql = "INSERT INTO SACH(MaSach,TenSach,TheLoai,TacGia,TinhTrang,GiaTien) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO SACH(MaSach,TenSach,TheLoai,MaTacGia,MaNXB,TinhTrang,GiaTien) VALUES (?,?,?,?,?,?,?)";
         PreparedStatement statement ; 
         try{
             statement = con.prepareStatement(sql);
@@ -55,6 +57,7 @@ public class DBConnect {
             statement.setString(4,stringsSQL[3]);
             statement.setString(5,stringsSQL[4]);
             statement.setString(6,stringsSQL[5]);
+            statement.setString(7,stringsSQL[6]);
             
             rowInserted = statement.executeUpdate();
         }
@@ -62,6 +65,7 @@ public class DBConnect {
             Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
         }
         return rowInserted;
+       
     }   
     public int ExecuteSQLUpdate (String[] stringsSQL){
         int rowInserted = 0;
