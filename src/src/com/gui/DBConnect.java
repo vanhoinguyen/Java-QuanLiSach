@@ -44,7 +44,23 @@ public class DBConnect {
         return rs;
     }
     
-    
+    public int ExecuteSQLUpdateTinhTrang (String[] stringsSQL){
+       int rowInserted = 0;
+        String sql = "UPDATE SACH SET TinhTrang=? WHERE MaSach=?";
+        PreparedStatement statement ; 
+        try{
+            statement = con.prepareStatement(sql);
+            statement.setString(1,stringsSQL[0]);
+            statement.setString(2,stringsSQL[1]);
+            
+            
+            rowInserted = statement.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        return rowInserted; 
+    }
     public int ExecuteSQLInsert (String[] stringsSQL){
         int rowInserted = 0;
         String sql = "INSERT INTO SACH(MaSach,TenSach,TheLoai,MaTacGia,MaNXB,TinhTrang,GiaTien) VALUES (?,?,?,?,?,?,?)";
@@ -422,4 +438,22 @@ public class DBConnect {
         return rowInserted;
     }
     
+    public int ExecuteSQLThongtinTraSach(String[] stringsSQL){
+        int rowInserted = 0;
+        String sql = "INSERT INTO ThongTinTraSach(MaTraSach,NgayTraSach,GiaTien) VALUES (?,?,?)";
+        PreparedStatement statement ; 
+        try{
+            statement = con.prepareStatement(sql);
+            statement.setString(1,stringsSQL[0]);
+            statement.setString(2,stringsSQL[1]);
+            statement.setString(3,stringsSQL[2]);
+            
+            
+            rowInserted = statement.executeUpdate();
+        }
+        catch(SQLException ex){
+            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        return rowInserted;  
+    }
 }

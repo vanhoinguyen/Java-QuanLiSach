@@ -41,6 +41,7 @@ public class GUI extends javax.swing.JFrame {
         showSumOfSach();
         showSumOfDocGia();
         showSumOfSachChoMuon();
+        showSumOfMoney();
     }
     public void ClearText(){
         inputMaSach.setText("");
@@ -105,9 +106,9 @@ public class GUI extends javax.swing.JFrame {
             Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
         }
     }
-    public int count = 0;
+     
     public void showSumOfSachChoMuon(){
-       
+       int count = 0; 
        ResultSet rs = con.getData("SELECT TinhTrang FROM SACH "); 
       
        try{
@@ -124,17 +125,18 @@ public class GUI extends javax.swing.JFrame {
         } 
        txtSoSachChoMuon.setText(String.valueOf(count));
     }
-//    public void showSumOfMoney(){
-//       ResultSet rs = con.getData("SELECT COUNT (*) as total FROM SACH "); 
-//      
-//       try{
-//        while (rs.next()){
-//            txtTongSoSach.setText( rs.getString("total"));
-//        }}
-//        catch(SQLException ex){
-//            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
-//        } 
-//    }
+    public void showSumOfMoney(){
+       ResultSet rs = con.getData("Select Sum(GiaTien) as total from ThongtinTraSach "); 
+      
+       try{
+        while (rs.next()){
+            txtDoanhThu.setText( rs.getString("total"));
+            System.out.println(rs.getString("total"));
+        }}
+        catch(SQLException ex){
+            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
+        } 
+    }
     public void showData(){
         String[] columnNames = {"Mã sách","Tên sách","Thể loại","Mã Tác giả","Mã NXB","Tình trạng","Gía tiền"};
         DefaultTableModel model = new DefaultTableModel();
@@ -164,6 +166,7 @@ public class GUI extends javax.swing.JFrame {
         catch(SQLException ex){
             Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
         }
+        
     }
     public void showDataDocGia(){
         String[] columnNames = {"Mã Độc Giả","Tên Độc Giả","Địa chỉ","Email","Số Điện Thoại"};
@@ -364,8 +367,8 @@ public class GUI extends javax.swing.JFrame {
         String TinhTrang = inputTinhTrang.getText();
         String GiaTien = inputGiaTien.getText();
         String[] stringsSQL = {TenSach,TheLoai,TacGia,TinhTrang,GiaTien,MaSach};
-        
         int isInsert = con.ExecuteSQLUpdate(stringsSQL);
+        
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã sửa dữ liệu thành công");
@@ -479,11 +482,24 @@ public class GUI extends javax.swing.JFrame {
         String MaPhieuMuon = Integer.toString(j);
         String MaDocGia = inputMaDocGia.getText();
         String MaSach = inputMaSach_Muon.getText();
+        
+        //kiểm tra cho mượn hay chưa
+        for (int i=0;i <tbQLMuonSach.getRowCount();i++)
+        {
+            if(tbQLMuonSach.getModel().getValueAt(i, 2).toString().equals (MaSach)){
+                System.out.println(tbQLMuonSach.getModel().getValueAt(i, 2).toString().equals (MaSach));
+                 JOptionPane.showMessageDialog(this,"Sách này đã được cho mượn");
+                 return;
+            }
+            
+        }
+        
         SimpleDateFormat Date_Format = new SimpleDateFormat("MM-dd-yyyy"); 
         String NgayMuon = Date_Format.format(datechooser.getDate()).toString();
         String MaDichVu = null;
         String[] stringsSQL = {MaPhieuMuon,MaDocGia,MaSach,NgayMuon,MaDichVu};
-        
+        String[] stringsSQL1 = {"Đã cho thuê",MaSach};
+        int isInsert1 = con.ExecuteSQLUpdateTinhTrang(stringsSQL1);
         int isInsert = con.ExecuteSQLInsertMuon(stringsSQL);
         if(isInsert > 0)
         {
@@ -494,7 +510,9 @@ public class GUI extends javax.swing.JFrame {
         {
             JOptionPane.showMessageDialog(this,"Bạn chưa thêm được dữ liệu");
         }
+        showData();
         showDataMuonSach();
+        showSumOfSachChoMuon();
         ClearTextMuon();              
        
     }
@@ -523,11 +541,44 @@ public class GUI extends javax.swing.JFrame {
         ClearTextMuon();
     }
     public void DeleteMuonData(){
+        //lấy dữ liệu textbox
         int selectedRow = tbQLMuonSach.getSelectedRow();
         String MaPhieuMuon = tbQLMuonSach.getValueAt(selectedRow,0).toString();
         String[] stringsSQL = {MaPhieuMuon};
+        String MaSach = inputMaSach_Muon.getText();
         
+        //Xóa
         int isInsert = con.ExecuteSQLDeleteMuon(stringsSQL);
+        //Update lại chưa cho mượn
+        String[] stringsSQL1 = {"Chưa cho thuê",MaSach};
+        int isInsert1 = con.ExecuteSQLUpdateTinhTrang(stringsSQL1);
+        //Thêm vào doanh thu
+        String MaTraSach ="";
+         ResultSet rs = con.getData("SELECT COUNT (*) as total FROM ThongtinTraSach "); 
+      
+       try{
+        while (rs.next()){
+            MaTraSach=Integer.toString( 1 + rs.getInt("total"));
+        }}
+        catch(SQLException ex){
+            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        SimpleDateFormat Date_Format = new SimpleDateFormat("MM-dd-yyyy"); 
+        Date date = new Date();
+        String NgayTraSach = Date_Format.format(date).toString();
+        
+        
+        ResultSet rs1 = con.getData("SELECT GiaTien FROM SACH WHERE MaSach = "+MaSach+" "); 
+        String GiaTien ="";
+       try{
+        while (rs1.next()){
+            GiaTien= rs1.getString("GiaTien");
+        }}
+        catch(SQLException ex){
+            Logger.getLogger(DBConnect.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        String[] stringsSQL2 = {MaTraSach,NgayTraSach,GiaTien};
+        int isInsert2 = con.ExecuteSQLThongtinTraSach(stringsSQL2);
         if(isInsert > 0)
         {
             JOptionPane.showMessageDialog(this,"Bạn đã xóa dữ liệu thành công");
@@ -536,7 +587,10 @@ public class GUI extends javax.swing.JFrame {
         {
             JOptionPane.showMessageDialog(this,"Bạn chưa xóa được dữ liệu");
         }
+        showData();
         showDataMuonSach();
+        showSumOfSachChoMuon();
+        showSumOfMoney();
         ClearTextMuon();
     }
     
@@ -817,6 +871,7 @@ public class GUI extends javax.swing.JFrame {
         showDataTacGia();
         ClearTextTacGia();
     }
+    
     
     public void getSelectedData (){
        int selectedRow = tbQLSach.getSelectedRow();
@@ -1160,9 +1215,8 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                     .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jLabel31, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE))
+                    .addComponent(jLabel31, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
                     .addComponent(jLabel38, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(27, 27, 27)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1498,7 +1552,7 @@ public class GUI extends javax.swing.JFrame {
         });
 
         btnXoaDocGia1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btnXoaDocGia1.setText("Xóa TT Mượn");
+        btnXoaDocGia1.setText("Trả Sách");
         btnXoaDocGia1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnXoaDocGia1ActionPerformed(evt);
