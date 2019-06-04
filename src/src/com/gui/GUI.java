@@ -494,7 +494,7 @@ public class GUI extends javax.swing.JFrame {
         }
         ClearText();
         showData();
-        
+        showThongKeData();
     }    
     public void UpdateSachData(){
         String MaSach = inputMaSach.getText();
@@ -519,7 +519,16 @@ public class GUI extends javax.swing.JFrame {
     }   
     public void DeleteSachData(){
         String MaSach = inputMaSach.getText();
-      
+        if(MaSach.length() == 0 )
+        {
+           JOptionPane.showMessageDialog(this,"Vui lòng chọn sách muốn xóa trong bảng ");
+           return;
+        }
+        if(inputTinhTrang.getText().equals("Đã cho thuê"))
+        {
+            JOptionPane.showMessageDialog(this,"Sách cho thuê , không thể xóa!");
+           return;
+        }
         String[] stringsSQL = {MaSach};
         
         int isInsert = con.ExecuteSQLDelete(stringsSQL);
