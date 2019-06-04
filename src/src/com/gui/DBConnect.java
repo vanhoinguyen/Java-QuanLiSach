@@ -43,7 +43,7 @@ public class DBConnect {
         }
         return rs;
     }
-    
+   
     public int ExecuteSQLUpdateTinhTrang (String[] stringsSQL){
        int rowInserted = 0;
         String sql = "UPDATE SACH SET TinhTrang=? WHERE MaSach=?";
